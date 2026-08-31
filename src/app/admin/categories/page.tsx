@@ -1,0 +1,9 @@
+'use client';
+import { FormEvent,useEffect,useState } from 'react';
+import AdminFrame from '@/components/AdminFrame';
+import { supabase } from '@/lib/supabase';
+
+type Cat={id:number;name:string;slug:string;is_active:boolean};
+const slugify=(s:string)=>s.toLowerCase().trim().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+export default function Categories(){const [items,setItems]=useState<Cat[]>([]);const [name,setName]=useState('');const [slug,setSlug]=useState('');const [msg,setMsg]=useState('');async function load(){const {data}=await supabase.from('categories').select('id,name,slug,is_active').order('sort_order');setItems((data??[]) as Cat[]);}useEffect(()=>{load();},[]);async function add(e:FormEvent){e.preventDefault();setMsg('');const finalSlug=slug||slugify(name);const {error}=await supabase.from('categories').insert({name,slug:finalSlug,sort_order:items.length+1});if(error){setMsg(error.message);return;}setName('');setSlug('');setMsg('ক্যাটাগরি যোগ হয়েছে।');load();}async function remove(id:number){if(!confirm('এই ক্যাটাগরি মুছে ফেলবেন?'))return;await supabase.from('categories').delete().eq('id',id);load();}
+return <AdminFrame><div className="adminHeading"><div><p>Newsroom</p><h1>ক্যাটাগরি</h1></div></div><div className="twoColAdmin"><form className="adminPanel formStack" onSubmit={add}><h2>নতুন ক্যাটাগরি</h2><label>নাম<input required value={name} onChange={e=>setName(e.target.value)}/></label><label>Slug<input placeholder="campus-news" value={slug} onChange={e=>setSlug(e.target.value)}/></label><button className="primaryBtn">যোগ করুন</button>{msg&&<small>{msg}</small>}</form><div className="adminPanel"><h2>সব ক্যাটাগরি</h2><div className="adminTable">{items.map(c=><div className="adminRow" key={c.id}><div><strong>{c.name}</strong><span>{c.slug}</span></div><span>{c.is_active?'Active':'Hidden'}</span><button className="dangerBtn" onClick={()=>remove(c.id)}>Delete</button></div>)}</div></div></div></AdminFrame>}
