@@ -6,6 +6,8 @@ import {getCategories,getPublishedArticles} from "@/lib/news";
 import type {Article} from "@/lib/data";
 import "./portal.css";
 
+export const dynamic="force-dynamic";
+
 function pick(items:Article[],start:number,count:number){
   if(!items.length)return [] as Article[];
   return Array.from({length:count},(_,i)=>items[(start+i)%items.length]);
@@ -13,13 +15,13 @@ function pick(items:Article[],start:number,count:number){
 
 function SmallStory({article}:{article:Article}){
   return <article className="refSmallStory">
-    <Link href={`/news/${article.slug}`}><Image src={article.image} alt={article.title} width={360} height={210}/></Link>
+    <Link href={`/news/${article.slug}`}><Image src={article.image} alt={article.title} width={360} height={210} sizes="96px"/></Link>
     <div><h4><Link href={`/news/${article.slug}`}>{article.title}</Link></h4><time>{article.publishedAt}</time></div>
   </article>;
 }
 
 function MiniList({items}:{items:Article[]}){
-  return <div className="refMiniList">{items.map((a,i)=><article key={`${a.id}-${i}`}><Link href={`/news/${a.slug}`}><Image src={a.image} alt={a.title} width={180} height={110}/></Link><h4><Link href={`/news/${a.slug}`}>{a.title}</Link></h4></article>)}</div>;
+  return <div className="refMiniList">{items.map((a,i)=><article key={`${a.id}-${i}`}><Link href={`/news/${a.slug}`}><Image src={a.image} alt={a.title} width={180} height={110} sizes="80px"/></Link><h4><Link href={`/news/${a.slug}`}>{a.title}</Link></h4></article>)}</div>;
 }
 
 function SectionBand({title,items,tint=false}:{title:string;items:Article[];tint?:boolean}){
@@ -28,7 +30,7 @@ function SectionBand({title,items,tint=false}:{title:string;items:Article[];tint
   return <section className={`refBand ${tint?'refBandTint':''}`} id={title==='জগন্নাথ বিশ্ববিদ্যালয়'?'jagannath-university':undefined}>
     <div className="refBandHead"><h2>{title}</h2><Link href="/search">আরও খবর</Link></div>
     <div className="refBandGrid">
-      <article className="refBandLead"><Link href={`/news/${lead.slug}`}><Image src={lead.image} alt={lead.title} width={760} height={400}/></Link><h3><Link href={`/news/${lead.slug}`}>{lead.title}</Link></h3><p>{lead.excerpt}</p></article>
+      <article className="refBandLead"><Link href={`/news/${lead.slug}`}><Image src={lead.image} alt={lead.title} width={760} height={400} sizes="(max-width:760px) 100vw, 42vw"/></Link><h3><Link href={`/news/${lead.slug}`}>{lead.title}</Link></h3><p>{lead.excerpt}</p></article>
       <div className="refTextColumns">{rest.slice(0,4).map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div>
       <MiniList items={rest.slice(4,8)}/>
     </div>
@@ -52,7 +54,7 @@ export default async function Home(){
     <div className="container refCanvas">
       <section className="refTopGrid">
         <aside className="refTopLeft"><div className="refBoxTitle">সর্বশেষ সংবাদ</div>{leftTop.map((a,i)=><SmallStory key={`${a.id}-${i}`} article={a}/>)}</aside>
-        <div className="refTopCenter"><article className="refLead"><Link href={`/news/${lead.slug}`}><Image src={lead.image} alt={lead.title} width={1200} height={650} priority/></Link><span>{lead.category}</span><h1><Link href={`/news/${lead.slug}`}>{lead.title}</Link></h1><p>{lead.excerpt}</p></article><div className="refHeadlineColumns">{centerList.map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div></div>
+        <div className="refTopCenter"><article className="refLead"><Link className="refLeadImage" href={`/news/${lead.slug}`}><Image src={lead.image} alt={lead.title} width={1200} height={650} priority unoptimized sizes="(max-width:760px) 100vw, (max-width:1050px) 70vw, 680px"/></Link><span>{lead.category}</span><h1><Link href={`/news/${lead.slug}`}>{lead.title}</Link></h1><p>{lead.excerpt}</p></article><div className="refHeadlineColumns">{centerList.map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div></div>
         <aside className="refTopRight"><div className="refAd refAdSide">ADVERTISEMENT</div><div className="refBoxTitle">জনপ্রিয়</div>{rightTop.map((a,i)=><SmallStory key={`${a.id}-${i}`} article={a}/>)}</aside>
       </section>
       <section className="refWideFeature"><div className="refBandHead"><h2>জাতীয় গুরুত্বপূর্ণ</h2><span>বিশেষ আয়োজন</span></div><div className="refWideFeatureGrid"><article><Link href={`/news/${pick(articles,1,1)[0].slug}`}><Image src={pick(articles,1,1)[0].image} alt={pick(articles,1,1)[0].title} width={720} height={330}/></Link></article><div>{pick(articles,2,3).map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div><MiniList items={pick(articles,6,3)}/></div></section>
