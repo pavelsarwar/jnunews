@@ -2,71 +2,20 @@ import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/Header";
 import PublicFooter from "@/components/PublicFooter";
+import AdSlot from "@/components/AdSlot";
 import {getCategories,getPublishedArticles} from "@/lib/news";
 import type {Article} from "@/lib/data";
 import "./portal.css";
 
 export const dynamic="force-dynamic";
 
-function pick(items:Article[],start:number,count:number){
-  if(!items.length)return [] as Article[];
-  return Array.from({length:count},(_,i)=>items[(start+i)%items.length]);
-}
-
-function SmallStory({article}:{article:Article}){
-  return <article className="refSmallStory">
-    <Link href={`/news/${article.slug}`}><Image src={article.image} alt={article.title} width={360} height={210} sizes="96px"/></Link>
-    <div><h4><Link href={`/news/${article.slug}`}>{article.title}</Link></h4><time>{article.publishedAt}</time></div>
-  </article>;
-}
-
-function MiniList({items}:{items:Article[]}){
-  return <div className="refMiniList">{items.map((a,i)=><article key={`${a.id}-${i}`}><Link href={`/news/${a.slug}`}><Image src={a.image} alt={a.title} width={180} height={110} sizes="80px"/></Link><h4><Link href={`/news/${a.slug}`}>{a.title}</Link></h4></article>)}</div>;
-}
-
-function SectionBand({title,items,tint=false}:{title:string;items:Article[];tint?:boolean}){
-  const [lead,...rest]=items;
-  if(!lead)return null;
-  return <section className={`refBand ${tint?'refBandTint':''}`} id={title==='জগন্নাথ বিশ্ববিদ্যালয়'?'jagannath-university':undefined}>
-    <div className="refBandHead"><h2>{title}</h2><Link href="/search">আরও খবর</Link></div>
-    <div className="refBandGrid">
-      <article className="refBandLead"><Link href={`/news/${lead.slug}`}><Image src={lead.image} alt={lead.title} width={760} height={400} sizes="(max-width:760px) 100vw, 42vw"/></Link><h3><Link href={`/news/${lead.slug}`}>{lead.title}</Link></h3><p>{lead.excerpt}</p></article>
-      <div className="refTextColumns">{rest.slice(0,4).map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div>
-      <MiniList items={rest.slice(4,8)}/>
-    </div>
-  </section>;
-}
+function pick(items:Article[],start:number,count:number){if(!items.length)return [] as Article[];return Array.from({length:count},(_,i)=>items[(start+i)%items.length]);}
+function SmallStory({article}:{article:Article}){return <article className="refSmallStory"><Link href={`/news/${article.slug}`}><Image src={article.image} alt={article.title} width={360} height={210} sizes="96px"/></Link><div><h4><Link href={`/news/${article.slug}`}>{article.title}</Link></h4><time>{article.publishedAt}</time></div></article>}
+function MiniList({items}:{items:Article[]}){return <div className="refMiniList">{items.map((a,i)=><article key={`${a.id}-${i}`}><Link href={`/news/${a.slug}`}><Image src={a.image} alt={a.title} width={180} height={110} sizes="80px"/></Link><h4><Link href={`/news/${a.slug}`}>{a.title}</Link></h4></article>)}</div>}
+function SectionBand({title,items,tint=false}:{title:string;items:Article[];tint?:boolean}){const [lead,...rest]=items;if(!lead)return null;return <section className={`refBand ${tint?'refBandTint':''}`} id={title==='জগন্নাথ বিশ্ববিদ্যালয়'?'jagannath-university':undefined}><div className="refBandHead"><h2>{title}</h2><Link href="/search">আরও খবর</Link></div><div className="refBandGrid"><article className="refBandLead"><Link href={`/news/${lead.slug}`}><Image src={lead.image} alt={lead.title} width={760} height={400} sizes="(max-width:760px) 100vw, 42vw"/></Link><h3><Link href={`/news/${lead.slug}`}>{lead.title}</Link></h3><p>{lead.excerpt}</p></article><div className="refTextColumns">{rest.slice(0,4).map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div><MiniList items={rest.slice(4,8)}/></div></section>}
 
 export default async function Home(){
-  const [articles,categories]=await Promise.all([getPublishedArticles(),getCategories()]);
-  const lead=articles.find(a=>a.featured)??articles[0];
-  const breaking=articles.find(a=>a.breaking)??articles[1];
-  const leftTop=pick(articles.filter(a=>a.id!==lead?.id),0,3);
-  const centerList=pick(articles.filter(a=>a.id!==lead?.id),2,6);
-  const rightTop=pick(articles.filter(a=>a.id!==lead?.id),5,4);
-  const sectionNames=["জগন্নাথ বিশ্ববিদ্যালয়","ক্যাম্পাস","শিক্ষা","জাতীয়","আন্তর্জাতিক","প্রযুক্তি","ক্যারিয়ার","খেলাধুলা","বিনোদন","মতামত"];
-  const groups=sectionNames.map((name,index)=>({name,items:[...articles.filter(a=>a.category===name),...pick(articles,index*2,8)].slice(0,9)}));
-
-  return <main className="referencePortal">
-    <Header/>
-    {breaking&&<div className="refTicker"><div className="container"><strong>ব্রেকিং</strong><Link href={`/news/${breaking.slug}`}>{breaking.title}</Link></div></div>}
-    <div className="container refAd refAdTop">ADVERTISEMENT</div>
-    <div className="container refCanvas">
-      <section className="refTopGrid">
-        <aside className="refTopLeft"><div className="refBoxTitle">সর্বশেষ সংবাদ</div>{leftTop.map((a,i)=><SmallStory key={`${a.id}-${i}`} article={a}/>)}</aside>
-        <div className="refTopCenter"><article className="refLead"><Link className="refLeadImage" href={`/news/${lead.slug}`}><Image src={lead.image} alt={lead.title} width={1200} height={650} priority unoptimized sizes="(max-width:760px) 100vw, (max-width:1050px) 70vw, 680px"/></Link><span>{lead.category}</span><h1><Link href={`/news/${lead.slug}`}>{lead.title}</Link></h1><p>{lead.excerpt}</p></article><div className="refHeadlineColumns">{centerList.map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div></div>
-        <aside className="refTopRight"><div className="refAd refAdSide">ADVERTISEMENT</div><div className="refBoxTitle">জনপ্রিয়</div>{rightTop.map((a,i)=><SmallStory key={`${a.id}-${i}`} article={a}/>)}</aside>
-      </section>
-      <section className="refWideFeature"><div className="refBandHead"><h2>জাতীয় গুরুত্বপূর্ণ</h2><span>বিশেষ আয়োজন</span></div><div className="refWideFeatureGrid"><article><Link href={`/news/${pick(articles,1,1)[0].slug}`}><Image src={pick(articles,1,1)[0].image} alt={pick(articles,1,1)[0].title} width={720} height={330}/></Link></article><div>{pick(articles,2,3).map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div><MiniList items={pick(articles,6,3)}/></div></section>
-      <div className="refBlueLinks">{categories.slice(0,8).map(c=><Link key={c.id} href={`/#${c.slug}`}>{c.name}</Link>)}</div>
-      {groups.slice(0,2).map((g,i)=><SectionBand key={g.name} title={g.name} items={g.items} tint={i===1}/>)}
-      <section className="refMediaRow"><div className="refBandHead"><h2>ভিডিও</h2><span>JnU News</span></div><div className="refMediaGrid">{pick(articles,3,3).map((a,i)=><article key={`${a.id}-${i}`}><Link href={`/news/${a.slug}`}><div className="refMediaImage"><Image src={a.image} alt={a.title} width={560} height={300}/><span>▶</span></div></Link><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3></article>)}</div></section>
-      {groups.slice(2,5).map(g=><SectionBand key={g.name} title={g.name} items={g.items}/>)}
-      <section className="refLogoRow">{["বিশ্ববিদ্যালয়","শিক্ষা","ক্যারিয়ার","প্রযুক্তি"].map((x)=><div key={x}><strong>{x}</strong><span>JNUNEWS</span></div>)}</section>
-      <section className="refPeopleGrid">{pick(articles,0,4).map((a,i)=><article key={`${a.id}-${i}`}><Link href={`/news/${a.slug}`}><Image src={a.image} alt={a.title} width={420} height={240}/></Link><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</section>
-      <div className="refTripleSections">{groups.slice(5,8).map(g=><section key={g.name}><div className="refBandHead"><h2>{g.name}</h2></div><MiniList items={g.items.slice(0,5)}/></section>)}</div>
-      <div className="refBottomSearch"><input aria-label="খবর খুঁজুন" placeholder="খবর খুঁজুন..."/><Link href="/search">অনুসন্ধান</Link></div>
-    </div>
-    <PublicFooter/>
-  </main>;
+ const [articles,categories]=await Promise.all([getPublishedArticles(),getCategories()]);
+ const lead=articles.find(a=>a.featured)??articles[0];const breaking=articles.find(a=>a.breaking)??articles[1];const leftTop=pick(articles.filter(a=>a.id!==lead?.id),0,3);const centerList=pick(articles.filter(a=>a.id!==lead?.id),2,6);const rightTop=pick(articles.filter(a=>a.id!==lead?.id),5,4);const sectionNames=["জগন্নাথ বিশ্ববিদ্যালয়","ক্যাম্পাস","শিক্ষা","জাতীয়","আন্তর্জাতিক","প্রযুক্তি","ক্যারিয়ার","খেলাধুলা","বিনোদন","মতামত"];const groups=sectionNames.map((name,index)=>({name,items:[...articles.filter(a=>a.category===name),...pick(articles,index*2,8)].slice(0,9)}));
+ return <main className="referencePortal"><Header/>{breaking&&<div className="refTicker"><div className="container"><strong>ব্রেকিং</strong><Link href={`/news/${breaking.slug}`}>{breaking.title}</Link></div></div>}<div className="container"><AdSlot position="home_top" className="dynamicAdTop"/></div><div className="container refCanvas"><section className="refTopGrid"><aside className="refTopLeft"><div className="refBoxTitle">সর্বশেষ সংবাদ</div>{leftTop.map((a,i)=><SmallStory key={`${a.id}-${i}`} article={a}/>)}</aside><div className="refTopCenter"><article className="refLead"><Link className="refLeadImage" href={`/news/${lead.slug}`}><Image src={lead.image} alt={lead.title} width={1200} height={650} priority unoptimized sizes="(max-width:760px) 100vw, (max-width:1050px) 70vw, 680px"/></Link><span>{lead.category}</span><h1><Link href={`/news/${lead.slug}`}>{lead.title}</Link></h1><p>{lead.excerpt}</p></article><div className="refHeadlineColumns">{centerList.map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div></div><aside className="refTopRight"><AdSlot position="home_sidebar" className="dynamicAdSide"/><div className="refBoxTitle">জনপ্রিয়</div>{rightTop.map((a,i)=><SmallStory key={`${a.id}-${i}`} article={a}/>)}</aside></section><section className="refWideFeature"><div className="refBandHead"><h2>জাতীয় গুরুত্বপূর্ণ</h2><span>বিশেষ আয়োজন</span></div><div className="refWideFeatureGrid"><article><Link href={`/news/${pick(articles,1,1)[0].slug}`}><Image src={pick(articles,1,1)[0].image} alt={pick(articles,1,1)[0].title} width={720} height={330}/></Link></article><div>{pick(articles,2,3).map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div><MiniList items={pick(articles,6,3)}/></div></section><div className="refBlueLinks">{categories.slice(0,8).map(c=><Link key={c.id} href={`/#${c.slug}`}>{c.name}</Link>)}</div>{groups.slice(0,2).map((g,i)=><SectionBand key={g.name} title={g.name} items={g.items} tint={i===1}/>)}<AdSlot position="home_middle" className="dynamicAdMiddle"/><section className="refMediaRow"><div className="refBandHead"><h2>ভিডিও</h2><span>JnU News</span></div><div className="refMediaGrid">{pick(articles,3,3).map((a,i)=><article key={`${a.id}-${i}`}><Link href={`/news/${a.slug}`}><div className="refMediaImage"><Image src={a.image} alt={a.title} width={560} height={300}/><span>▶</span></div></Link><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3></article>)}</div></section>{groups.slice(2,5).map(g=><SectionBand key={g.name} title={g.name} items={g.items}/>) }<section className="refLogoRow">{["বিশ্ববিদ্যালয়","শিক্ষা","ক্যারিয়ার","প্রযুক্তি"].map(x=><div key={x}><strong>{x}</strong><span>JNUNEWS</span></div>)}</section><section className="refPeopleGrid">{pick(articles,0,4).map((a,i)=><article key={`${a.id}-${i}`}><Link href={`/news/${a.slug}`}><Image src={a.image} alt={a.title} width={420} height={240}/></Link><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</section><div className="refTripleSections">{groups.slice(5,8).map(g=><section key={g.name}><div className="refBandHead"><h2>{g.name}</h2></div><MiniList items={g.items.slice(0,5)}/></section>)}</div></div><PublicFooter/></main>;
 }
