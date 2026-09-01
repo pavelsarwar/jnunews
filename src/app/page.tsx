@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/Header";
+import PublicFooter from "@/components/PublicFooter";
 import {getCategories,getPublishedArticles} from "@/lib/news";
 import type {Article} from "@/lib/data";
 import "./portal.css";
@@ -47,62 +48,23 @@ export default async function Home(){
   return <main className="referencePortal">
     <Header/>
     {breaking&&<div className="refTicker"><div className="container"><strong>ব্রেকিং</strong><Link href={`/news/${breaking.slug}`}>{breaking.title}</Link></div></div>}
-
     <div className="container refAd refAdTop">ADVERTISEMENT</div>
-
     <div className="container refCanvas">
       <section className="refTopGrid">
-        <aside className="refTopLeft">
-          <div className="refBoxTitle">সর্বশেষ সংবাদ</div>
-          {leftTop.map((a,i)=><SmallStory key={`${a.id}-${i}`} article={a}/>)}
-        </aside>
-
-        <div className="refTopCenter">
-          <article className="refLead">
-            <Link href={`/news/${lead.slug}`}><Image src={lead.image} alt={lead.title} width={1200} height={650} priority/></Link>
-            <span>{lead.category}</span>
-            <h1><Link href={`/news/${lead.slug}`}>{lead.title}</Link></h1>
-            <p>{lead.excerpt}</p>
-          </article>
-          <div className="refHeadlineColumns">{centerList.map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div>
-        </div>
-
-        <aside className="refTopRight">
-          <div className="refAd refAdSide">ADVERTISEMENT</div>
-          <div className="refBoxTitle">জনপ্রিয়</div>
-          {rightTop.map((a,i)=><SmallStory key={`${a.id}-${i}`} article={a}/>)}
-        </aside>
+        <aside className="refTopLeft"><div className="refBoxTitle">সর্বশেষ সংবাদ</div>{leftTop.map((a,i)=><SmallStory key={`${a.id}-${i}`} article={a}/>)}</aside>
+        <div className="refTopCenter"><article className="refLead"><Link href={`/news/${lead.slug}`}><Image src={lead.image} alt={lead.title} width={1200} height={650} priority/></Link><span>{lead.category}</span><h1><Link href={`/news/${lead.slug}`}>{lead.title}</Link></h1><p>{lead.excerpt}</p></article><div className="refHeadlineColumns">{centerList.map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div></div>
+        <aside className="refTopRight"><div className="refAd refAdSide">ADVERTISEMENT</div><div className="refBoxTitle">জনপ্রিয়</div>{rightTop.map((a,i)=><SmallStory key={`${a.id}-${i}`} article={a}/>)}</aside>
       </section>
-
-      <section className="refWideFeature">
-        <div className="refBandHead"><h2>জাতীয় গুরুত্বপূর্ণ</h2><span>বিশেষ আয়োজন</span></div>
-        <div className="refWideFeatureGrid">
-          <article><Link href={`/news/${pick(articles,1,1)[0].slug}`}><Image src={pick(articles,1,1)[0].image} alt={pick(articles,1,1)[0].title} width={720} height={330}/></Link></article>
-          <div>{pick(articles,2,3).map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div>
-          <MiniList items={pick(articles,6,3)}/>
-        </div>
-      </section>
-
+      <section className="refWideFeature"><div className="refBandHead"><h2>জাতীয় গুরুত্বপূর্ণ</h2><span>বিশেষ আয়োজন</span></div><div className="refWideFeatureGrid"><article><Link href={`/news/${pick(articles,1,1)[0].slug}`}><Image src={pick(articles,1,1)[0].image} alt={pick(articles,1,1)[0].title} width={720} height={330}/></Link></article><div>{pick(articles,2,3).map((a,i)=><article key={`${a.id}-${i}`}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</div><MiniList items={pick(articles,6,3)}/></div></section>
       <div className="refBlueLinks">{categories.slice(0,8).map(c=><Link key={c.id} href={`/#${c.slug}`}>{c.name}</Link>)}</div>
-
       {groups.slice(0,2).map((g,i)=><SectionBand key={g.name} title={g.name} items={g.items} tint={i===1}/>)}
-
-      <section className="refMediaRow">
-        <div className="refBandHead"><h2>ভিডিও</h2><span>JnU News</span></div>
-        <div className="refMediaGrid">{pick(articles,3,3).map((a,i)=><article key={`${a.id}-${i}`}><Link href={`/news/${a.slug}`}><div className="refMediaImage"><Image src={a.image} alt={a.title} width={560} height={300}/><span>▶</span></div></Link><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3></article>)}</div>
-      </section>
-
+      <section className="refMediaRow"><div className="refBandHead"><h2>ভিডিও</h2><span>JnU News</span></div><div className="refMediaGrid">{pick(articles,3,3).map((a,i)=><article key={`${a.id}-${i}`}><Link href={`/news/${a.slug}`}><div className="refMediaImage"><Image src={a.image} alt={a.title} width={560} height={300}/><span>▶</span></div></Link><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3></article>)}</div></section>
       {groups.slice(2,5).map(g=><SectionBand key={g.name} title={g.name} items={g.items}/>)}
-
-      <section className="refLogoRow">{["বিশ্ববিদ্যালয়","শিক্ষা","ক্যারিয়ার","প্রযুক্তি"].map((x,i)=><div key={x}><strong>{x}</strong><span>JNUNEWS</span></div>)}</section>
-
+      <section className="refLogoRow">{["বিশ্ববিদ্যালয়","শিক্ষা","ক্যারিয়ার","প্রযুক্তি"].map((x)=><div key={x}><strong>{x}</strong><span>JNUNEWS</span></div>)}</section>
       <section className="refPeopleGrid">{pick(articles,0,4).map((a,i)=><article key={`${a.id}-${i}`}><Link href={`/news/${a.slug}`}><Image src={a.image} alt={a.title} width={420} height={240}/></Link><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><p>{a.excerpt}</p></article>)}</section>
-
       <div className="refTripleSections">{groups.slice(5,8).map(g=><section key={g.name}><div className="refBandHead"><h2>{g.name}</h2></div><MiniList items={g.items.slice(0,5)}/></section>)}</div>
-
       <div className="refBottomSearch"><input aria-label="খবর খুঁজুন" placeholder="খবর খুঁজুন..."/><Link href="/search">অনুসন্ধান</Link></div>
     </div>
-
-    <footer className="refFooter"><div className="container refFooterGrid"><div><div className="brand footerBrand"><span className="brandMark">JnU</span><span>NEWS</span></div><p>স্বাধীন ও দায়িত্বশীল ডিজিটাল সংবাদমাধ্যম।</p></div><div><strong>সম্পাদকীয়</strong><p>সত্য, নির্ভুলতা ও দায়িত্বশীল সাংবাদিকতায় অঙ্গীকারবদ্ধ।</p></div><div><strong>বিভাগ</strong><p>ক্যাম্পাস • শিক্ষা • জাতীয় • আন্তর্জাতিক • প্রযুক্তি</p></div><div><strong>যোগাযোগ</strong><p>Dhaka, Bangladesh</p></div></div></footer>
+    <PublicFooter/>
   </main>;
 }
