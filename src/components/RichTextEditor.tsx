@@ -3,7 +3,6 @@
 import { useCallback } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import Youtube from '@tiptap/extension-youtube';
 import { supabase } from '@/lib/supabase';
@@ -12,10 +11,9 @@ export default function RichTextEditor({value,onChange}:{value:string;onChange:(
   const editor=useEditor({
     immediatelyRender:false,
     extensions:[
-      StarterKit,
-      Link.configure({openOnClick:false,autolink:true}),
+      StarterKit.configure({link:{openOnClick:false,autolink:true}}),
       Image.configure({HTMLAttributes:{class:'articleInlineImage'}}),
-      Youtube.configure({controls:true,nocookie:true,width:800,height:450,HTMLAttributes:{class:'articleYoutube'}}),
+      Youtube.configure({controls:true,nocookie:true,width:800,height:450}),
     ],
     content:value || '<p></p>',
     editorProps:{attributes:{class:'richEditorContent'}},
