@@ -17,23 +17,7 @@ do $$ begin
   using (id = auth.uid());
 exception when duplicate_object then null; end $$;
 
-do $$ begin
-  create policy "Admins can read all profiles"
-  on public.profiles for select
-  to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin' and p.is_active = true));
-exception when duplicate_object then null; end $$;
-
-do $$ begin
-  create policy "Admins can update profiles"
-  on public.profiles for update
-  to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin' and p.is_active = true))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin' and p.is_active = true));
-exception when duplicate_object then null; end $$;
-
 grant select on public.profiles to authenticated;
-grant update on public.profiles to authenticated;
 
 insert into public.profiles (id, email, full_name, role, is_active, created_at, updated_at)
 select
@@ -59,11 +43,7 @@ begin
     new.id,
     new.email,
     coalesce(new.raw_user_meta_data->>'full_name', ''),
-    case
-      when new.raw_user_meta_data->>'role' in ('admin','editor','reporter')
-        then new.raw_user_meta_data->>'role'
-      else 'reporter'
-    end,
+    'reporter',
     true
   )
   on conflict (id) do update set
