@@ -17,6 +17,7 @@ export default function AdminNav(){
       <Link href="/admin/articles">সংবাদ</Link>
       <Link href="/admin/articles/new">+ নতুন সংবাদ</Link>
       <Link href="/admin/categories">ক্যাটাগরি</Link>
+      <Link href="/admin/seed">Demo Data</Link>
       <Link href="/" target="_blank">সাইট দেখুন</Link>
       <button className="adminLogout" onClick={logout}>লগআউট</button>
     </nav>
@@ -31,6 +32,7 @@ export default function AdminNav(){
       <Link href="/admin/articles">সংবাদ</Link>
       <Link href="/admin/articles/new">+ নতুন সংবাদ</Link>
       <Link href="/admin/categories">ক্যাটাগরি</Link>
+      <Link href="/admin/seed">Demo Data</Link>
       <Link href="/" target="_blank">সাইট</Link>
     </nav>
   </div>
