@@ -3,6 +3,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import HomeSection from "@/components/HomeSection";
 import {getCategories,getPublishedArticles} from "@/lib/news";
+import "./portal.css";
 
 export default async function Home(){
   const [articles,categories]=await Promise.all([getPublishedArticles(),getCategories()]);
