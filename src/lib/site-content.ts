@@ -18,21 +18,6 @@ const defaultLinks:FooterLink[]=[
 {id:6,label:'নিউজলেটার',url:'/newsletter',sort_order:6,is_active:true}
 ];
 
-export async function getSiteSettings():Promise<SiteSettings>{
- if(!db)return defaultSettings;
- const {data,error}=await db.from('site_settings').select('copyright_text,facebook_url,youtube_url,instagram_url,linkedin_url,x_url').eq('id',1).maybeSingle();
- return error||!data?defaultSettings:data as SiteSettings;
-}
-
-export async function getFooterLinks():Promise<FooterLink[]>{
- if(!db)return defaultLinks;
- const {data,error}=await db.from('footer_links').select('id,label,url,sort_order,is_active').eq('is_active',true).order('sort_order');
- return error||!data?.length?defaultLinks:data as FooterLink[];
-}
-
-export async function getAd(position:string):Promise<Ad|null>{
- if(!db)return null;
- const now=new Date().toISOString();
- const {data,error}=await db.from('ads').select('id,title,position,image_url,link_url,alt_text,is_active,sort_order').eq('position',position).eq('is_active',true).or(`start_at.is.null,start_at.lte.${now}`).or(`end_at.is.null,end_at.gte.${now}`).order('sort_order').limit(1).maybeSingle();
- return error||!data?null:data as Ad;
-}
+export async function getSiteSettings():Promise<SiteSettings>{if(!db)return defaultSettings;const {data,error}=await db.from('site_settings').select('copyright_text,facebook_url,youtube_url,instagram_url,linkedin_url,x_url').eq('id',1).maybeSingle();return error||!data?defaultSettings:data as SiteSettings;}
+export async function getFooterLinks():Promise<FooterLink[]>{if(!db)return defaultLinks;const {data,error}=await db.from('footer_links').select('id,label,url,sort_order,is_active').eq('is_active',true).order('sort_order');return error||!data?.length?defaultLinks:data as FooterLink[];}
+export async function getAd(position:string):Promise<Ad|null>{if(!db)return null;const {data,error}=await db.from('ads').select('id,title,position,image_url,link_url,alt_text,is_active,sort_order').eq('position',position).eq('is_active',true).order('sort_order').limit(1).maybeSingle();return error||!data?null:data as Ad;}
