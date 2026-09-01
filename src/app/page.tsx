@@ -1,2 +1,51 @@
-import Image from "next/image"; import Link from "next/link"; import Header from "@/components/Header"; import NewsCard from "@/components/NewsCard"; import {getCategories,getPublishedArticles} from "@/lib/news";
-export default async function Home(){const [articles,categories]=await Promise.all([getPublishedArticles(),getCategories()]);const lead=articles.find(a=>a.featured)??articles[0];const breaking=articles.find(a=>a.breaking);return <main><Header/>{breaking&&<section className="breaking"><div className="container breakingInner"><strong>ব্রেকিং</strong><span>{breaking.title}</span></div></section>}<div className="container pageSpace"><section className="heroGrid"><article className="leadStory"><Link href={`/news/${lead.slug}`} className="leadImage"><Image src={lead.image} alt={lead.title} width={1400} height={760} priority sizes="(max-width: 900px) 100vw, 65vw"/></Link><span className="categoryLabel">{lead.category}</span><h1><Link href={`/news/${lead.slug}`}>{lead.title}</Link></h1><p>{lead.excerpt}</p><time>{lead.publishedAt}</time></article><aside className="latest"><div className="sectionTitle"><h2>সর্বশেষ</h2><span>সব খবর</span></div>{articles.slice(1,7).map(a=><NewsCard key={a.id} article={a} compact/>)}</aside></section><section className="section"><div className="sectionTitle"><h2>আরও খবর</h2><span>JnU News</span></div><div className="cardGrid">{articles.slice(1,10).map(a=><NewsCard key={a.id} article={a}/>)}</div></section><section className="section categorySection" id="jagannath-university"><div className="sectionTitle"><h2>জগন্নাথ বিশ্ববিদ্যালয়</h2><span>বিশেষ বিভাগ</span></div><div className="categoryFeature"><div><p className="eyebrow">JNUNEWS FOCUS</p><h2>ক্যাম্পাসের প্রতিটি গুরুত্বপূর্ণ খবর এক জায়গায়</h2><p>শিক্ষার্থী, শিক্ষক, গবেষণা, সংগঠন, প্রশাসন ও অর্জনের সংবাদ—বিশ্ববিদ্যালয় কমিউনিটির জন্য একটি নির্ভরযোগ্য ডিজিটাল প্ল্যাটফর্ম।</p></div><div className="categoryChips">{categories.slice(0,8).map(c=><span key={c.id}>{c.name}</span>)}</div></div></section></div><footer><div className="container footerGrid"><div><div className="brand footerBrand"><span className="brandMark">JnU</span><span>NEWS</span></div><p>জগন্নাথ বিশ্ববিদ্যালয় থেকে বিশ্বজুড়ে।</p></div><div><strong>সম্পাদকীয়</strong><p>সত্য, নির্ভুলতা ও দায়িত্বশীল সাংবাদিকতায় অঙ্গীকারবদ্ধ।</p></div><div><strong>যোগাযোগ</strong><p>JnU News • Dhaka, Bangladesh</p></div></div></footer></main>}
+import Image from "next/image";
+import Link from "next/link";
+import Header from "@/components/Header";
+import HomeSection from "@/components/HomeSection";
+import {getCategories,getPublishedArticles} from "@/lib/news";
+
+export default async function Home(){
+  const [articles,categories]=await Promise.all([getPublishedArticles(),getCategories()]);
+  const lead=articles.find(a=>a.featured)??articles[0];
+  const breaking=articles.find(a=>a.breaking);
+  const side=articles.filter(a=>a.id!==lead?.id).slice(0,4);
+  const latest=articles.filter(a=>a.id!==lead?.id).slice(4,10);
+  const grouped=categories.slice(0,6).map(c=>({category:c,items:articles.filter(a=>a.category===c.name).slice(0,5)})).filter(g=>g.items.length);
+
+  return <main>
+    <Header/>
+    {breaking&&<section className="breaking"><div className="container breakingInner"><strong>ব্রেকিং</strong><Link href={`/news/${breaking.slug}`}>{breaking.title}</Link></div></section>}
+
+    <div className="container portalHome">
+      <section className="portalLeadGrid">
+        <div className="portalSideStories">{side.slice(0,2).map(a=><article key={a.id}><Link href={`/news/${a.slug}`}><Image src={a.image} alt={a.title} width={520} height={320}/></Link><span>{a.category}</span><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3></article>)}</div>
+
+        <article className="portalMainLead">
+          <Link href={`/news/${lead.slug}`}><Image src={lead.image} alt={lead.title} width={1200} height={700} priority/></Link>
+          <span className="categoryLabel">{lead.category}</span>
+          <h1><Link href={`/news/${lead.slug}`}>{lead.title}</Link></h1>
+          <p>{lead.excerpt}</p>
+          <time>{lead.publishedAt}</time>
+        </article>
+
+        <aside className="portalLatest">
+          <div className="portalTitleBar"><h2>সর্বশেষ</h2><span>JnU News</span></div>
+          {latest.length?latest.map(a=><article key={a.id}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><time>{a.publishedAt}</time></article>):side.slice(2).map(a=><article key={a.id}><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><time>{a.publishedAt}</time></article>)}
+        </aside>
+      </section>
+
+      <section className="portalStrip">{articles.slice(1,5).map(a=><article key={a.id}><Link href={`/news/${a.slug}`}><Image src={a.image} alt={a.title} width={420} height={240}/></Link><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3></article>)}</section>
+
+      <div className="portalSections">
+        {grouped.map(g=><HomeSection key={g.category.id} title={g.category.name} articles={g.items}/>) }
+      </div>
+
+      <section className="portalSection">
+        <div className="portalSectionHead"><h2>আরও খবর</h2><span>সর্বশেষ আপডেট</span></div>
+        <div className="portalMoreGrid">{articles.slice(6,18).map(a=><article key={a.id}><Link href={`/news/${a.slug}`}><Image src={a.image} alt={a.title} width={520} height={300}/></Link><span>{a.category}</span><h3><Link href={`/news/${a.slug}`}>{a.title}</Link></h3><time>{a.publishedAt}</time></article>)}</div>
+      </section>
+    </div>
+
+    <footer><div className="container footerGrid"><div><div className="brand footerBrand"><span className="brandMark">JnU</span><span>NEWS</span></div><p>জগন্নাথ বিশ্ববিদ্যালয় থেকে বিশ্বজুড়ে।</p></div><div><strong>সম্পাদকীয়</strong><p>সত্য, নির্ভুলতা ও দায়িত্বশীল সাংবাদিকতায় অঙ্গীকারবদ্ধ।</p></div><div><strong>যোগাযোগ</strong><p>JnU News • Dhaka, Bangladesh</p></div></div></footer>
+  </main>;
+}
